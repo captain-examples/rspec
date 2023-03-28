@@ -1,4 +1,4 @@
-name: 'Captain CI example'
+name: "Captain CI example"
 on:
   pull_request:
   push:
@@ -22,4 +22,35 @@ jobs:
               --format json --out tmp/rspec.json \
               --format progress
         env:
+          RWX_ACCESS_TOKEN: ${{ secrets.RWX_ACCESS_TOKEN }}
+  test-partitioned:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        partition_index: ["0", "1"]
+        partition_total: ["2"]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - uses: rwx-research/setup-captain@v1
+      - run: |
+          test_files=$(
+            captain partition \
+            --index ${{ matrix.partition_index }} \
+            --total ${{ matrix.partition_total }} \
+            "spec/**/*_spec.rb"
+          )
+
+          captain run \
+            --test-results tmp/rspec.json \
+            --reporter junit-xml=tmp/junit.xml \
+            -- bundle exec rspec \
+              --format json --out tmp/rspec.json \
+              --format progress $test_files
+        env:
+          # note: instead of setting suite-id we set the CAPTAIN_SUITE_ID environment variable
+          # to ensure `captain partition` and `captain run` share a suite-id
+          CAPTAIN_SUITE_ID: rspec
           RWX_ACCESS_TOKEN: ${{ secrets.RWX_ACCESS_TOKEN }}
