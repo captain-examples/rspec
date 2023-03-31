@@ -13,14 +13,7 @@ jobs:
         with:
           bundler-cache: true
       - uses: rwx-research/setup-captain@v1
-      - run: |
-          captain run \
-            --suite-id captain-examples-rspec \
-            --test-results tmp/rspec.json \
-            -- \
-            bundle exec rspec \
-              --format json --out tmp/rspec.json \
-              --format progress
+      - run: captain run captain-examples-rspec
         env:
           RWX_ACCESS_TOKEN: ${{ secrets.RWX_ACCESS_TOKEN }}
   test-partitioned:
@@ -43,14 +36,9 @@ jobs:
             "spec/**/*_spec.rb"
           )
 
-          captain run \
-            --test-results tmp/rspec.json \
-            --reporter junit-xml=tmp/junit.xml \
-            -- bundle exec rspec \
-              --format json --out tmp/rspec.json \
-              --format progress $test_files
+          captain run -- $test_files
         env:
           # note: instead of setting suite-id we set the CAPTAIN_SUITE_ID environment variable
           # to ensure `captain partition` and `captain run` share a suite-id
-          CAPTAIN_SUITE_ID: rspec
+          CAPTAIN_SUITE_ID: captain-examples-rspec
           RWX_ACCESS_TOKEN: ${{ secrets.RWX_ACCESS_TOKEN }}
