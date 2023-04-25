@@ -29,14 +29,7 @@ jobs:
           bundler-cache: true
       - uses: rwx-research/setup-captain@v1
       - run: |
-          test_files=$(
-            captain partition \
-            --index ${{ matrix.partition_index }} \
-            --total ${{ matrix.partition_total }} \
-            "spec/**/*_spec.rb"
-          )
-
-          captain run -- $test_files
+          captain run --partition-index ${{ matrix.partition_index }} --partition-total ${{ matrix.partition_total }}
         env:
           # note: instead of setting suite-id we set the CAPTAIN_SUITE_ID environment variable
           # to ensure `captain partition` and `captain run` share a suite-id
