@@ -29,9 +29,6 @@ jobs:
           bundler-cache: true
       - uses: rwx-research/setup-captain@v1
       - run: |
-          captain run --partition-index ${{ matrix.partition_index }} --partition-total ${{ matrix.partition_total }}
+          captain run captain-examples-rspec --partition-index ${{ matrix.partition_index }} --partition-total ${{ matrix.partition_total }}
         env:
-          # note: instead of setting suite-id we set the CAPTAIN_SUITE_ID environment variable
-          # to ensure `captain partition` and `captain run` share a suite-id
-          CAPTAIN_SUITE_ID: captain-examples-rspec
           RWX_ACCESS_TOKEN: ${{ secrets.RWX_ACCESS_TOKEN }}
